@@ -1,0 +1,22 @@
+{
+  "name": "proyectomvpreserva",
+  "version": "1.0.0",
+  "description": "Proyecto Final de WEB, Relacionado a Reservas",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "echo \"Backend levantado correctamente\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DominusWolz/ProyectoMVPReserva.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/DominusWolz/ProyectoMVPReserva/issues"
+  },
+  "homepage": "https://github.com/DominusWolz/ProyectoMVPReserva#readme"
+}

@@ -1,0 +1,10 @@
+# Dependencias
+node_modules/
+client/node_modules/
+
+# Variables de entorno (Secretos)
+.env
+client/.env
+
+# Logs y otros
+npm-debug.log

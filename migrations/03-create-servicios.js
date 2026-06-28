@@ -1,29 +1,24 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('reservas', {
+    await queryInterface.createTable('servicios', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false
       },
-      nombre_cliente: {
+      nombre: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      fecha_hora: {
-        type: Sequelize.DATE,
-        allowNull: false
-      },
-      mesa_id: {
+      duracion: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: 'mesas',
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'RESTRICT'
+        comment: 'Duración en minutos'
+      },
+      precio: {
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: false
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -36,6 +31,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('reservas');
+    await queryInterface.dropTable('servicios');
   }
 };

@@ -18,6 +18,10 @@ const Reserva = (sequelize) => {
     mesa_id: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    servicio_id: { // <--- Agregamos este campo
+      type: DataTypes.INTEGER,
+      allowNull: false
     }
   }, {
     tableName: 'reservas',

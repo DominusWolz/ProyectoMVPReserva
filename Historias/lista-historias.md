@@ -28,3 +28,18 @@
 3. Dado el README, cuando consulto configuración, entonces explica cómo copiar `.env.example` a `.env`.
 
 **Requiere interfaz web:** No
+
+## MVP-GEN-03: Base de datos y modelos
+
+* **Obligatoriedad:** Obligatoria
+
+**Historia de usuario**
+* **Como** equipo
+* **Quiero** al menos 2 modelos Sequelize con migraciones en MySQL (Adaptado de PostgreSQL)
+* **Para** persistir el dominio del sistema (Mesas y Reservas)
+
+**Criterios de aceptación**
+1. Dado el proyecto, cuando se revisa el repositorio, existen los archivos de migración correspondientes en la carpeta `migrations/`.
+2. Dado los modelos, cuando se revisa el código en `src/models/`, están definidos utilizando la estructura de Sequelize para las entidades `Mesa` y `Reserva`.
+
+**Requiere interfaz web:** No

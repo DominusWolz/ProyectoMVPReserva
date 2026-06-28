@@ -85,3 +85,49 @@ Bash
 cd client
 npm run dev
 El frontend levantará en la URL local que te indique la terminal (por defecto suele ser http://localhost:5173).
+
+
+//////////////////////////////////////////////////////////////////////////////
+
+🚀 Resumen de Avance: Proyecto MVP Reservas
+Hola equipo, les dejo un resumen de lo que ya está configurado en el repositorio. Ya tenemos listos los primeros 3 requerimientos generales obligatorios (MVP-GEN-01 al 03) y la base de datos estructurada.
+
+1. Estructura del Repositorio (MVP-GEN-01)
+
+Ya tenemos la arquitectura base dividida en dos partes:
+
+client/: Para el frontend (configurado con Vite).
+
+src/: Para el backend (Node.js + Express).
+
+Se configuró el archivo package.json en la raíz. Si clonan el repo y ejecutan npm run dev, el proyecto levanta sin errores (cumpliendo la rúbrica del profesor).
+
+El README.md ya está redactado con las instrucciones exactas de instalación.
+
+2. Variables de Entorno y Seguridad (MVP-GEN-02)
+
+Se creó el archivo .env.example con las variables de muestra (puerto, credenciales de BD, y JWT Secret).
+
+El archivo .gitignore ya está configurado para ocultar la carpeta node_modules y evitar que nuestros passwords reales (.env) se suban a GitHub.
+
+3. Base de Datos y Modelos (MVP-GEN-03)
+
+Decidimos usar MySQL con Sequelize como ORM.
+
+Ya se crearon los archivos de migración y los modelos en la carpeta src/models/ para 3 entidades:
+
+Usuario: Con roles (admin y cliente) y credenciales.
+
+Mesa: Con número y capacidad.
+
+Reserva: Vinculada a la mesa mediante llave foránea, con nombre del cliente y fecha/hora.
+
+Nota BD: Ya tenemos el script SQL listo para que cada uno pueda crear la base de datos reservas_db y estas 3 tablas en su propio MySQL local con un solo copy-paste.
+
+Siguientes pasos para el equipo:
+
+Clonar el repo, hacer npm install y probar que a todos les levante el entorno.
+
+Conectar Express con la base de datos de MySQL en nuestro archivo principal.
+
+Empezar a repartirnos las rutas y controladores (ej. crear usuarios, hacer reservas) o el diseño del frontend.

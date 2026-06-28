@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Servicios - Admin</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+        .form-group { background: #f4f4f4; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        input { padding: 8px; margin-right: 10px; }
+        button { padding: 8px 15px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button.danger { background: #dc3545; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+    </style>
+</head>
+<body>
+    <h1>Gestión de Servicios (Panel Admin)</h1>
+    
+    <div class="form-group">
+        <h3>Crear Nuevo Servicio</h3>
+        <input type="text" id="nombre" placeholder="Nombre (ej. Cena VIP)">
+        <input type="number" id="duracion" placeholder="Duración (min)">
+        <input type="number" id="precio" placeholder="Precio ($)">
+        <button onclick="crearServicio()">Guardar Servicio</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Duración</th>
+                <th>Precio</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-servicios">
+            </tbody>
+    </table>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api/servicios';
+
+        // 1. Leer Servicios (Read)
+        async function cargarServicios() {
+            const res = await fetch(API_URL);
+            const servicios = await res.json();
+            const tbody = document.getElementById('tabla-servicios');
+            tbody.innerHTML = '';
+            
+            servicios.forEach(s => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${s.id}</td>
+                        <td>${s.nombre}</td>
+                        <td>${s.duracion} min</td>
+                        <td>$${s.precio}</td>
+                        <td>
+                            <button class="danger" onclick="eliminarServicio(${s.id})">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // 2. Crear Servicio (Create)
+        async function crearServicio() {
+            const nombre = document.getElementById('nombre').value;
+            const duracion = document.getElementById('duracion').value;
+            const precio = document.getElementById('precio').value;
+
+            if(!nombre || !duracion || !precio) return alert("Llena todos los campos");
+
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, duracion, precio })
+            });
+            
+            // Limpiar inputs y recargar tabla
+            document.getElementById('nombre').value = '';
+            document.getElementById('duracion').value = '';
+            document.getElementById('precio').value = '';
+            cargarServicios(); 
+        }
+
+        // 3. Eliminar Servicio (Delete)
+        async function eliminarServicio(id) {
+            if(confirm('¿Estás seguro de eliminar este servicio?')) {
+                const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                if(!res.ok) {
+                    const error = await res.json();
+                    alert(error.error);
+                }
+                cargarServicios();
+            }
+        }
+
+        // Cargar los datos al abrir la página
+        cargarServicios();
+    </script>
+</body>
+</html>

@@ -3,6 +3,7 @@ CREATE DATABASE IF NOT EXISTS reservas_db;
 USE reservas_db;
 
 -- 2. Crear la tabla de Usuarios
+DROP TABLE IF EXISTS `Usuario`; 
 CREATE TABLE IF NOT EXISTS usuarios (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nombre VARCHAR(255) NOT NULL,
@@ -14,12 +15,15 @@ CREATE TABLE IF NOT EXISTS usuarios (
 );
 
 -- 3. Crear la tabla de Mesas
+DROP TABLE IF EXISTS `mesas`; 
 CREATE TABLE IF NOT EXISTS mesas (
   id INT AUTO_INCREMENT PRIMARY KEY,
   numero INT NOT NULL UNIQUE,
   capacidad INT NOT NULL
 );
 
+
+DROP TABLE IF EXISTS `servicios`; 
 CREATE TABLE IF NOT EXISTS servicios (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nombre VARCHAR(255) NOT NULL,
@@ -29,6 +33,7 @@ CREATE TABLE IF NOT EXISTS servicios (
   updatedAt DATETIME NOT NULL
 );
 
+DROP TABLE IF EXISTS `reservas`; 
 CREATE TABLE IF NOT EXISTS reservas (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nombre_cliente VARCHAR(255) NOT NULL,

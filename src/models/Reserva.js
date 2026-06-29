@@ -7,20 +7,25 @@ const Reserva = (sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
-    nombre_cliente: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    fecha_hora: {
-      type: DataTypes.DATE,
+    usuario_id: {
+      type: DataTypes.INTEGER,
       allowNull: false
     },
     mesa_id: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    servicio_id: { // <--- Agregamos este campo
+    servicio_id: {
       type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    fecha_hora: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    estado: {
+      type: DataTypes.ENUM('pendiente', 'confirmada', 'cancelada'),
+      defaultValue: 'confirmada',
       allowNull: false
     }
   }, {

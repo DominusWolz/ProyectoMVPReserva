@@ -3,7 +3,7 @@
     "username": "root",
     "password": "Catdog10",
     "database": "reservas_db",
-    "host": "127.0.0.1",
+    "host": "localhost",
     "dialect": "mysql"
   }
 }

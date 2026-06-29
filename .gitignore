@@ -6,5 +6,8 @@ client/node_modules/
 .env
 client/.env
 
+# Build
+client/dist/
+
 # Logs y otros
 npm-debug.log

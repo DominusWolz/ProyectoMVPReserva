@@ -7,13 +7,15 @@ module.exports = {
         autoIncrement: true,
         allowNull: false
       },
-      nombre_cliente: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      fecha_hora: {
-        type: Sequelize.DATE,
-        allowNull: false
+      usuario_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'usuarios',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT'
       },
       mesa_id: {
         type: Sequelize.INTEGER,
@@ -34,6 +36,15 @@ module.exports = {
         },
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
+      },
+      fecha_hora: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      estado: {
+        type: Sequelize.ENUM('pendiente', 'confirmada', 'cancelada'),
+        defaultValue: 'confirmada',
+        allowNull: false
       },
       createdAt: {
         type: Sequelize.DATE,

@@ -1,6 +1,4 @@
 const { DataTypes } = require('sequelize');
-// Nota: Aquí se importará la conexión a la base de datos más adelante
-const sequelize = require('../index.js'); 
 
 const Mesa = (sequelize) => {
   return sequelize.define('Mesa', {

@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const { obtenerServicios, crearServicio, actualizarServicio, eliminarServicio } = require('../controllers/servicio.controller.js');
+const { verifyToken, esAdmin } = require('../middlewares/auth.middleware');
 
-// Aquí agregaremos el middleware de Autenticación más adelante
 router.get('/', obtenerServicios);
-router.post('/', crearServicio);
-router.put('/:id', actualizarServicio);
-router.delete('/:id', eliminarServicio);
+router.post('/', verifyToken, esAdmin, crearServicio);
+router.put('/:id', verifyToken, esAdmin, actualizarServicio);
+router.delete('/:id', verifyToken, esAdmin, eliminarServicio);
 
 module.exports = router;

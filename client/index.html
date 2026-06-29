@@ -3,381 +3,873 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración | Reservas</title>
+    <title>Sistema de Reservas</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
     <style>
         :root {
-            --primary-color: #4F46E5; /* Azul índigo moderno */
+            --primary: #4F46E5;
             --primary-hover: #4338CA;
-            --danger-color: #EF4444;
+            --danger: #EF4444;
             --danger-hover: #DC2626;
-            --warning-color: #F59E0B;
-            --warning-hover: #D97706;
-            --bg-color: #F3F4F6;
-            --card-bg: #FFFFFF;
-            --text-main: #111827;
-            --text-muted: #6B7280;
-            --border-color: #E5E7EB;
+            --warning: #F59E0B;
+            --success: #10B981;
+            --bg: #F3F4F6;
+            --card: #FFFFFF;
+            --text: #111827;
+            --muted: #6B7280;
+            --border: #E5E7EB;
         }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+        a { text-decoration: none; color: var(--primary); }
+        a:hover { text-decoration: underline; }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Sidebar / Menú lateral simulado */
         .sidebar {
-            width: 260px;
-            background-color: var(--card-bg);
-            border-right: 1px solid var(--border-color);
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            width: 250px; background: var(--card); border-right: 1px solid var(--border);
+            padding: 24px 16px; display: flex; flex-direction: column; gap: 8px; position: fixed; height: 100vh; z-index: 10;
         }
-
         .sidebar-logo {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
+            font-size: 1.2rem; font-weight: 700; color: var(--primary);
+            padding-bottom: 16px; border-bottom: 1px solid var(--border); margin-bottom: 8px;
         }
-
-        .sidebar-menu-item {
-            padding: 12px 16px;
-            background-color: #EEF2FF;
-            color: var(--primary-color);
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
+        .sidebar-user {
+            font-size: 0.85rem; color: var(--muted); padding: 8px 12px; border-bottom: 1px solid var(--border); margin-bottom: 8px;
         }
-
-        /* Contenido Principal */
-        .main-content {
-            flex: 1;
-            padding: 40px;
-            max-width: 1200px;
+        .sidebar-item {
+            padding: 10px 14px; border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 0.9rem;
+            color: var(--text); transition: all 0.15s;
         }
+        .sidebar-item:hover { background: #EEF2FF; color: var(--primary); }
+        .sidebar-item.active { background: #EEF2FF; color: var(--primary); font-weight: 600; }
+        .sidebar-item.logout { margin-top: auto; color: var(--danger); }
+        .sidebar-item.logout:hover { background: #FEE2E2; }
 
-        .header-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
+        .main { flex: 1; margin-left: 250px; padding: 32px 40px; max-width: 1200px; }
+        .page-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 4px; }
+        .page-subtitle { color: var(--muted); margin-bottom: 24px; font-size: 0.95rem; }
 
-        .header-subtitle {
-            color: var(--text-muted);
-            margin-bottom: 32px;
-            font-size: 0.95rem;
-        }
-
-        /* Tarjeta del Formulario */
         .card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            padding: 24px;
-            margin-bottom: 32px;
-            border: 1px solid var(--border-color);
+            background: var(--card); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            padding: 24px; margin-bottom: 24px; border: 1px solid var(--border);
         }
+        .card h3 { margin-bottom: 16px; font-size: 1.05rem; }
 
-        .card h3 {
-            margin-bottom: 20px;
-            font-size: 1.1rem;
-            color: var(--text-main);
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; align-items: end; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group label { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
+        input, select {
+            padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem;
+            outline: none; transition: 0.2s; background: white;
         }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            align-items: end;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .input-group label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-
-        input {
-            padding: 10px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            outline: none;
-            transition: all 0.2s;
-        }
-
-        input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
+        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
 
         .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            padding: 9px 18px; border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+            border: none; cursor: pointer; transition: 0.15s; display: inline-flex; align-items: center; gap: 6px;
         }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: #F3F4F6; color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: #E5E7EB; }
+        .btn-danger { background: #FEE2E2; color: var(--danger-hover); border: 1px solid #FECACA; font-size: 0.82rem; padding: 5px 10px; }
+        .btn-danger:hover { background: #FECACA; }
+        .btn-warning { background: #FEF3C7; color: #D97706; border: 1px solid #FDE68A; font-size: 0.82rem; padding: 5px 10px; }
+        .btn-warning:hover { background: #FDE68A; }
+        .btn-success { background: var(--success); color: white; }
 
-        .btn-primary { background-color: var(--primary-color); color: white; }
-        .btn-primary:hover { background-color: var(--primary-hover); }
-        
-        .btn-secondary { background-color: #F3F4F6; color: var(--text-main); border: 1px solid var(--border-color); }
-        .btn-secondary:hover { background-color: #E5E7EB; }
-        
-        .btn-warning { background-color: #FEF3C7; color: var(--warning-hover); border: 1px solid #FDE68A; padding: 6px 12px; font-size: 0.85rem;}
-        .btn-warning:hover { background-color: #FDE68A; }
-        
-        .btn-danger { background-color: #FEE2E2; color: var(--danger-hover); border: 1px solid #FECACA; padding: 6px 12px; font-size: 0.85rem;}
-        .btn-danger:hover { background-color: #FECACA; }
-
-        .form-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        /* Tabla de Datos */
         .table-container {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border-color);
-            overflow: hidden;
+            background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden;
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th {
-            background-color: #F9FAFB;
-            padding: 14px 20px;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        td {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.95rem;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover {
-            background-color: #F9FAFB;
-        }
-
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: #F9FAFB; padding: 12px 16px; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); border-bottom: 1px solid var(--border); }
+        td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: #F9FAFB; }
         .badge {
-            background-color: #EEF2FF;
-            color: var(--primary-color);
-            padding: 4px 10px;
-            border-radius: 999px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 600;
         }
+        .badge-primary { background: #EEF2FF; color: var(--primary); }
+        .badge-success { background: #D1FAE5; color: #065F46; }
+        .badge-danger { background: #FEE2E2; color: #991B1B; }
+        .badge-warning { background: #FEF3C7; color: #92400E; }
+        .actions-cell { display: flex; gap: 6px; }
+        .price { font-weight: 600; }
+        .hidden { display: none; }
+        .text-center { text-align: center; }
+        .mt-4 { margin-top: 16px; }
 
-        .price-text {
-            font-weight: 600;
-            color: var(--text-main);
+        .auth-container {
+            max-width: 400px; margin: 60px auto; padding: 32px; background: var(--card);
+            border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
-        
-        .actions-cell {
-            display: flex;
-            gap: 8px;
+        .auth-title { font-size: 1.4rem; font-weight: 700; text-align: center; margin-bottom: 24px; }
+        .auth-link { text-align: center; margin-top: 16px; font-size: 0.9rem; }
+
+        .alert {
+            padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 0.85rem; font-weight: 500;
         }
+        .alert-error { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+        .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+
+        .agenda-card {
+            background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+            padding: 14px 18px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .agenda-time { font-weight: 700; font-size: 1rem; min-width: 80px; }
+        .agenda-info { flex: 1; margin: 0 16px; }
+        .agenda-info span { display: block; font-size: 0.88rem; }
+        .agenda-info .agenda-cliente { font-weight: 600; }
+        .agenda-info .agenda-detalle { color: var(--muted); font-size: 0.82rem; }
+
+        .sidebar-item.hidden { display: none; }
+        #auth-views { display: block; }
+        #app-views { display: none; }
+
+        .view { display: none; }
+        .view.active { display: block; }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none;
+            align-items: center; justify-content: center; z-index: 100;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: white; border-radius: 12px; padding: 28px; max-width: 450px; width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: center;
+        }
+        .modal h2 { margin-bottom: 12px; }
+        .modal p { color: var(--muted); margin-bottom: 4px; font-size: 0.95rem; }
+        .modal .precio-final { font-size: 1.5rem; font-weight: 700; color: var(--primary); margin: 12px 0; }
     </style>
 </head>
 <body>
 
+<div id="auth-views">
+    <div id="view-login" class="auth-container">
+        <div class="auth-title">Iniciar Sesion</div>
+        <div id="login-error" class="alert alert-error hidden"></div>
+        <div class="input-group" style="margin-bottom:12px">
+            <label>Email</label>
+            <input type="email" id="login-email" placeholder="correo@ejemplo.com">
+        </div>
+        <div class="input-group" style="margin-bottom:16px">
+            <label>Contrasena</label>
+            <input type="password" id="login-password" placeholder="••••••">
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="login()">Ingresar</button>
+        <div class="auth-link">¿No tienes cuenta? <a href="#" onclick="showAuth('register')">Registrate</a></div>
+    </div>
+
+    <div id="view-register" class="auth-container hidden">
+        <div class="auth-title">Crear Cuenta</div>
+        <div id="register-error" class="alert alert-error hidden"></div>
+        <div id="register-success" class="alert alert-success hidden"></div>
+        <div class="input-group" style="margin-bottom:12px">
+            <label>Nombre</label>
+            <input type="text" id="reg-nombre" placeholder="Tu nombre">
+        </div>
+        <div class="input-group" style="margin-bottom:12px">
+            <label>Email</label>
+            <input type="email" id="reg-email" placeholder="correo@ejemplo.com">
+        </div>
+        <div class="input-group" style="margin-bottom:16px">
+            <label>Contrasena (min. 6 caracteres)</label>
+            <input type="password" id="reg-password" placeholder="••••••">
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="register()">Registrarse</button>
+        <div class="auth-link">¿Ya tienes cuenta? <a href="#" onclick="showAuth('login')">Inicia sesion</a></div>
+    </div>
+</div>
+
+<div id="app-views">
     <aside class="sidebar">
-        <div class="sidebar-logo">
-            📅 Disponibilidades
-        </div>
-        <div class="sidebar-menu-item">
-            📋 Servicios
-        </div>
-        </aside>
+        <div class="sidebar-logo">Restaurante</div>
+        <div class="sidebar-user" id="sidebar-user"></div>
+        <div class="sidebar-item active" data-role="cliente,admin" onclick="navigate('reservar')">Reservar</div>
+        <div class="sidebar-item" data-role="cliente,admin" onclick="navigate('mis-reservas')">Mis Reservas</div>
+        <div class="sidebar-item" data-role="admin" onclick="navigate('servicios')">Servicios</div>
+        <div class="sidebar-item" data-role="admin" onclick="navigate('mesas')">Mesas</div>
+        <div class="sidebar-item" data-role="admin" onclick="navigate('disponibilidad')">Horarios</div>
+        <div class="sidebar-item" data-role="admin" onclick="navigate('agenda')">Agenda del Dia</div>
+        <div class="sidebar-item" data-role="admin" onclick="navigate('reservas-fecha')">Reservas por Fecha</div>
+        <div class="sidebar-item logout" onclick="logout()">Cerrar Sesion</div>
+    </aside>
 
-    <main class="main-content">
-        <h1 class="header-title">Catálogo de Servicios</h1>
-        <p class="header-subtitle">Gestiona las opciones reservables de tu restaurante.</p>
-        
-        <div class="card">
-            <h3 id="form-title">✨ Crear Nuevo Servicio</h3>
-            <div class="form-grid">
-                <input type="hidden" id="servicio-id">
-                
-                <div class="input-group">
-                    <label for="nombre">Nombre del servicio</label>
-                    <input type="text" id="nombre" placeholder="Ej. Cena VIP">
-                </div>
-                
-                <div class="input-group">
-                    <label for="duracion">Duración (minutos)</label>
-                    <input type="number" id="duracion" placeholder="Ej. 120">
-                </div>
-                
-                <div class="input-group">
-                    <label for="precio">Precio base ($)</label>
-                    <input type="number" id="precio" placeholder="Ej. 15000">
-                </div>
+    <div class="main">
 
-                <div class="form-actions">
-                    <button id="btn-guardar" class="btn btn-primary" onclick="guardarServicio()">
-                        Guardar
-                    </button>
-                    <button id="btn-cancelar" class="btn btn-secondary" style="display:none;" onclick="cancelarEdicion()">
-                        Cancelar
-                    </button>
+        <div id="view-reservar" class="view active">
+            <h1 class="page-title">Reservar una Cita</h1>
+            <p class="page-subtitle">Elige servicio, mesa, fecha y hora disponible.</p>
+            <div id="reservar-error" class="alert alert-error hidden"></div>
+            <div id="reservar-success" class="alert alert-success hidden"></div>
+            <div class="card">
+                <h3>Nueva Reserva</h3>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Servicio</label>
+                        <select id="res-servicio" onchange="cargarSlots()"><option value="">Selecciona...</option></select>
+                    </div>
+                    <div class="input-group">
+                        <label>Mesa</label>
+                        <select id="res-mesa" onchange="cargarSlots()"><option value="">Selecciona...</option></select>
+                    </div>
+                    <div class="input-group">
+                        <label>Fecha</label>
+                        <input type="date" id="res-fecha" onchange="cargarSlots()">
+                    </div>
+                    <div class="input-group">
+                        <label>Horario</label>
+                        <select id="res-horario"><option value="">Primero elige fecha</option></select>
+                    </div>
+                    <div class="form-actions" style="display:flex;gap:10px;align-items:end">
+                        <button class="btn btn-primary" onclick="confirmarReserva()">Reservar</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Servicio</th>
-                        <th>Tiempo Estimado</th>
-                        <th>Costo</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="tabla-servicios">
-                    </tbody>
-            </table>
+        <div id="view-mis-reservas" class="view">
+            <h1 class="page-title">Mis Reservas</h1>
+            <p class="page-subtitle">Tus reservas activas y anteriores.</p>
+            <div id="mis-reservas-container" class="table-container">
+                <table><thead><tr><th>#</th><th>Servicio</th><th>Mesa</th><th>Fecha y Hora</th><th>Estado</th><th>Accion</th></tr></thead><tbody id="tabla-mis-reservas"></tbody></table>
+            </div>
         </div>
-    </main>
 
-    <script>
-        const API_URL = 'http://localhost:3000/api/servicios';
+        <div id="view-servicios" class="view">
+            <h1 class="page-title">Servicios</h1>
+            <p class="page-subtitle">Gestiona el catalogo de servicios del restaurante.</p>
+            <div class="card">
+                <h3 id="svc-form-title">Crear Servicio</h3>
+                <div class="form-grid">
+                    <input type="hidden" id="svc-id">
+                    <div class="input-group"><label>Nombre</label><input type="text" id="svc-nombre" placeholder="Ej. Cena VIP"></div>
+                    <div class="input-group"><label>Duracion (min)</label><input type="number" id="svc-duracion" placeholder="120"></div>
+                    <div class="input-group"><label>Precio ($)</label><input type="number" id="svc-precio" placeholder="15000"></div>
+                    <div class="form-actions" style="display:flex;gap:10px;align-items:end">
+                        <button class="btn btn-primary" onclick="guardarServicio()">Guardar</button>
+                        <button class="btn btn-secondary hidden" id="svc-cancelar" onclick="cancelarEdicionServicio()">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table><thead><tr><th>ID</th><th>Servicio</th><th>Duracion</th><th>Precio</th><th>Acciones</th></tr></thead><tbody id="tabla-servicios"></tbody></table>
+            </div>
+        </div>
 
-        async function cargarServicios() {
-            try {
-                const res = await fetch(API_URL);
-                const servicios = await res.json();
-                const tbody = document.getElementById('tabla-servicios');
-                tbody.innerHTML = '';
-                
-                servicios.forEach(s => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td style="color: var(--text-muted);">#${s.id}</td>
-                            <td style="font-weight: 500;">${s.nombre}</td>
-                            <td><span class="badge">⏱ ${s.duracion} min</span></td>
-                            <td class="price-text">$${s.precio}</td>
-                            <td class="actions-cell">
-                                <button class="btn btn-warning" onclick="prepararEdicion(${s.id}, '${s.nombre}', ${s.duracion}, ${s.precio})">✎ Editar</button>
-                                <button class="btn btn-danger" onclick="eliminarServicio(${s.id})">✖ Borrar</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            } catch (error) {
-                console.error("Error al conectar con el backend:", error);
+        <div id="view-mesas" class="view">
+            <h1 class="page-title">Mesas</h1>
+            <p class="page-subtitle">Administra las mesas del restaurante.</p>
+            <div class="card">
+                <h3 id="mesa-form-title">Agregar Mesa</h3>
+                <div class="form-grid">
+                    <input type="hidden" id="mesa-id">
+                    <div class="input-group"><label>Numero</label><input type="number" id="mesa-numero" placeholder="1"></div>
+                    <div class="input-group"><label>Capacidad (personas)</label><input type="number" id="mesa-capacidad" placeholder="4"></div>
+                    <div class="form-actions" style="display:flex;gap:10px;align-items:end">
+                        <button class="btn btn-primary" onclick="guardarMesa()">Guardar</button>
+                        <button class="btn btn-secondary hidden" id="mesa-cancelar" onclick="cancelarEdicionMesa()">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table><thead><tr><th>ID</th><th>Mesa #</th><th>Capacidad</th><th>Acciones</th></tr></thead><tbody id="tabla-mesas"></tbody></table>
+            </div>
+        </div>
+
+        <div id="view-disponibilidad" class="view">
+            <h1 class="page-title">Horarios Disponibles</h1>
+            <p class="page-subtitle">Configura las franjas horarias por dia de la semana.</p>
+            <div class="card">
+                <h3 id="disp-form-title">Agregar Horario</h3>
+                <div class="form-grid">
+                    <input type="hidden" id="disp-id">
+                    <div class="input-group">
+                        <label>Dia</label>
+                        <select id="disp-dia">
+                            <option value="1">Domingo</option><option value="2">Lunes</option><option value="3">Martes</option>
+                            <option value="4">Miercoles</option><option value="5">Jueves</option><option value="6">Viernes</option><option value="7">Sabado</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><label>Hora Inicio</label><input type="time" id="disp-inicio"></div>
+                    <div class="input-group"><label>Hora Fin</label><input type="time" id="disp-fin"></div>
+                    <div class="input-group"><label>Intervalo (min)</label><input type="number" id="disp-intervalo" value="60"></div>
+                    <div class="form-actions" style="display:flex;gap:10px;align-items:end">
+                        <button class="btn btn-primary" onclick="guardarDisponibilidad()">Guardar</button>
+                        <button class="btn btn-secondary hidden" id="disp-cancelar" onclick="cancelarEdicionDisp()">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table><thead><tr><th>Dia</th><th>Inicio</th><th>Fin</th><th>Intervalo</th><th>Acciones</th></tr></thead><tbody id="tabla-disponibilidad"></tbody></table>
+            </div>
+        </div>
+
+        <div id="view-agenda" class="view">
+            <h1 class="page-title">Agenda del Dia</h1>
+            <p class="page-subtitle">Visualiza todas las citas del dia.</p>
+            <div class="card">
+                <div style="display:flex;gap:12px;align-items:end">
+                    <div class="input-group">
+                        <label>Fecha</label>
+                        <input type="date" id="agenda-fecha">
+                    </div>
+                    <button class="btn btn-primary" onclick="cargarAgenda()">Ver Agenda</button>
+                </div>
+            </div>
+            <div id="agenda-container"></div>
+        </div>
+
+        <div id="view-reservas-fecha" class="view">
+            <h1 class="page-title">Reservas por Fecha</h1>
+            <p class="page-subtitle">Filtra las reservas por fecha especifica.</p>
+            <div class="card">
+                <div style="display:flex;gap:12px;align-items:end">
+                    <div class="input-group">
+                        <label>Fecha</label>
+                        <input type="date" id="rf-fecha">
+                    </div>
+                    <button class="btn btn-primary" onclick="cargarReservasPorFecha()">Filtrar</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table><thead><tr><th>#</th><th>Cliente</th><th>Servicio</th><th>Mesa</th><th>Hora</th><th>Estado</th></tr></thead><tbody id="tabla-reservas-fecha"></tbody></table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-confirmacion">
+    <div class="modal">
+        <h2>Reserva Confirmada</h2>
+        <p id="modal-servicio"></p>
+        <p id="modal-mesa"></p>
+        <p id="modal-fecha"></p>
+        <p id="modal-hora"></p>
+        <div class="precio-final" id="modal-precio"></div>
+        <button class="btn btn-primary mt-4" onclick="cerrarModal()">Aceptar</button>
+    </div>
+</div>
+
+<script>
+    const API = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+        ? 'http://localhost:3000/api'
+        : 'https://tu-api.railway.app/api';
+
+    let usuario = JSON.parse(localStorage.getItem('usuario'));
+    let token = localStorage.getItem('token');
+
+    const DIAS = {1:'Domingo',2:'Lunes',3:'Martes',4:'Miercoles',5:'Jueves',6:'Viernes',7:'Sabado'};
+
+    function getToken() { return localStorage.getItem('token'); }
+
+    async function apiFetch(url, options = {}) {
+        const headers = { 'Content-Type': 'application/json', ...options.headers };
+        const t = getToken();
+        if (t) headers['Authorization'] = 'Bearer ' + t;
+        const res = await fetch(API + url, { ...options, headers });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw { status: res.status, data };
+        return data;
+    }
+
+    function getError(err) {
+        if (err && err.data && err.data.error) return err.data.error;
+        if (err && err.message) return err.message;
+        return 'Error desconocido';
+    }
+
+    function show(el) { if (typeof el === 'string') el = document.getElementById(el); el.classList.remove('hidden'); }
+    function hide(el) { if (typeof el === 'string') el = document.getElementById(el); el.classList.add('hidden'); }
+
+    function init() {
+        if (usuario && token) {
+            document.getElementById('auth-views').style.display = 'none';
+            document.getElementById('app-views').style.display = 'block';
+            document.getElementById('sidebar-user').textContent = usuario.nombre + ' (' + usuario.rol + ')';
+
+            document.querySelectorAll('[data-role]').forEach(el => {
+                const roles = el.getAttribute('data-role').split(',');
+                if (!roles.includes(usuario.rol)) el.classList.add('hidden');
+            });
+
+            cargarServiciosSelect();
+            cargarMesasSelect();
+            cargarServiciosTabla();
+            cargarMesasTabla();
+            cargarDisponibilidad();
+            setDefaultDates();
+
+            const hash = location.hash.slice(1) || 'reservar';
+            navigate(hash);
+        } else {
+            document.getElementById('auth-views').style.display = 'block';
+            document.getElementById('app-views').style.display = 'none';
+            const hash = location.hash.slice(1);
+            if (hash === 'register') showAuth('register');
+            else showAuth('login');
+        }
+    }
+
+    function navigate(view) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('view-' + view).classList.add('active');
+        document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll('.sidebar-item[onclick*="' + view + '"]').forEach(i => i.classList.add('active'));
+        location.hash = view;
+        if (view === 'mis-reservas') cargarMisReservas();
+        if (view === 'agenda') cargarAgenda();
+        if (view === 'reservas-fecha') cargarReservasPorFecha();
+    }
+
+    function showAuth(view) {
+        hide('view-login'); hide('view-register'); hide('login-error'); hide('register-error'); hide('register-success');
+        show('view-' + view);
+    }
+
+    async function login() {
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value.trim();
+        hide('login-error');
+        if (!email || !password) { show('login-error'); document.getElementById('login-error').textContent = 'Todos los campos son obligatorios'; return; }
+
+        try {
+            const res = await fetch(API + '/auth/login', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('usuario', JSON.stringify(data.usuario));
+            usuario = data.usuario; token = data.token;
+            init();
+        } catch (err) {
+            show('login-error');
+            document.getElementById('login-error').textContent = err.message;
+        }
+    }
+
+    async function register() {
+        const nombre = document.getElementById('reg-nombre').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const password = document.getElementById('reg-password').value.trim();
+        hide('register-error'); hide('register-success');
+
+        if (!nombre || !email || !password) { show('register-error'); document.getElementById('register-error').textContent = 'Todos los campos son obligatorios'; return; }
+        if (password.length < 6) { show('register-error'); document.getElementById('register-error').textContent = 'La contrasena debe tener al menos 6 caracteres'; return; }
+
+        try {
+            const res = await fetch(API + '/auth/register', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, email, password })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+
+            show('register-success');
+            document.getElementById('register-success').textContent = 'Registro exitoso. Ahora puedes iniciar sesion.';
+            document.getElementById('reg-nombre').value = '';
+            document.getElementById('reg-email').value = '';
+            document.getElementById('reg-password').value = '';
+        } catch (err) {
+            show('register-error');
+            document.getElementById('register-error').textContent = err.message;
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
+        usuario = null; token = null;
+        location.hash = '';
+        init();
+    }
+
+    function setDefaultDates() {
+        const today = new Date().toISOString().split('T')[0];
+        const el1 = document.getElementById('res-fecha');
+        if (el1) el1.value = today;
+        const el2 = document.getElementById('agenda-fecha');
+        if (el2) el2.value = today;
+        const el3 = document.getElementById('rf-fecha');
+        if (el3) el3.value = today;
+    }
+
+    function cerrarModal() {
+        document.getElementById('modal-confirmacion').classList.remove('active');
+    }
+
+    async function cargarServiciosSelect() {
+        try {
+            const data = await apiFetch('/servicios');
+            const sel = document.getElementById('res-servicio');
+            sel.innerHTML = '<option value="">Selecciona...</option>';
+            data.forEach(s => { sel.innerHTML += '<option value="' + s.id + '" data-precio="' + s.precio + '" data-duracion="' + s.duracion + '">' + s.nombre + ' - $' + s.precio + '</option>'; });
+        } catch (e) { console.error(e); }
+    }
+
+    async function cargarMesasSelect() {
+        try {
+            const data = await apiFetch('/mesas');
+            const sel = document.getElementById('res-mesa');
+            sel.innerHTML = '<option value="">Selecciona...</option>';
+            data.forEach(m => { sel.innerHTML += '<option value="' + m.id + '">Mesa #' + m.numero + ' (Cap. ' + m.capacidad + ')</option>'; });
+        } catch (e) { console.error(e); }
+    }
+
+    async function cargarSlots() {
+        const servicioId = document.getElementById('res-servicio').value;
+        const mesaId = document.getElementById('res-mesa').value;
+        const fecha = document.getElementById('res-fecha').value;
+        const sel = document.getElementById('res-horario');
+        sel.innerHTML = '<option value="">Cargando...</option>';
+
+        if (!servicioId || !mesaId || !fecha) {
+            sel.innerHTML = '<option value="">Completa los campos</option>';
+            return;
+        }
+
+        try {
+            const duracion = document.querySelector('#res-servicio option:checked').getAttribute('data-duracion');
+            const disp = await apiFetch('/disponibilidades');
+            const diaSemana = new Date(fecha).getDay() + 1;
+            const hoy = disp.find(d => d.dia_semana === diaSemana);
+
+            if (!hoy) {
+                sel.innerHTML = '<option value="">No hay horarios para este dia</option>';
+                return;
             }
-        }
 
-        async function guardarServicio() {
-            const id = document.getElementById('servicio-id').value;
-            const nombre = document.getElementById('nombre').value;
-            const duracion = document.getElementById('duracion').value;
-            const precio = document.getElementById('precio').value;
+            const reservas = await apiFetch('/reservas/agenda?fecha=' + fecha).catch(() => []);
 
-            if(!nombre || !duracion || !precio) return alert("Por favor, llena todos los campos");
+            const slots = generarSlots(hoy.hora_inicio.slice(0,5), hoy.hora_fin.slice(0,5), parseInt(hoy.intervalo_min), parseInt(duracion));
 
-            const datos = { nombre, duracion: parseInt(duracion), precio: parseFloat(precio) };
+            sel.innerHTML = '<option value="">Selecciona horario</option>';
 
-            if (id) {
-                await fetch(`${API_URL}/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(datos)
-                });
-            } else {
-                await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(datos)
-                });
-            }
-            
-            cancelarEdicion();
-            cargarServicios(); 
-        }
-
-        function prepararEdicion(id, nombre, duracion, precio) {
-            document.getElementById('servicio-id').value = id;
-            document.getElementById('nombre').value = nombre;
-            document.getElementById('duracion').value = duracion;
-            document.getElementById('precio').value = precio;
-            
-            document.getElementById('form-title').innerText = "✏️ Editar Servicio #" + id;
-            document.getElementById('btn-guardar').innerText = "Actualizar";
-            document.getElementById('btn-cancelar').style.display = "inline-flex";
-        }
-
-        function cancelarEdicion() {
-            document.getElementById('servicio-id').value = '';
-            document.getElementById('nombre').value = '';
-            document.getElementById('duracion').value = '';
-            document.getElementById('precio').value = '';
-            
-            document.getElementById('form-title').innerText = "✨ Crear Nuevo Servicio";
-            document.getElementById('btn-guardar').innerText = "Guardar";
-            document.getElementById('btn-cancelar').style.display = "none";
-        }
-
-        async function eliminarServicio(id) {
-            if(confirm('¿Estás seguro de que deseas eliminar este servicio?')) {
-                const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-                if(!res.ok) {
-                    const error = await res.json();
-                    alert(error.error);
+            slots.forEach(h => {
+                const ocupado = reservas.some(r =>
+                    r.mesa_id == mesaId &&
+                    r.estado !== 'cancelada' &&
+                    conflictoHorario(r.fecha_hora, fecha + 'T' + h, parseInt(duracion))
+                );
+                if (!ocupado) {
+                    sel.innerHTML += '<option value="' + h + '">' + h + '</option>';
                 }
-                cargarServicios();
+            });
+
+            if (sel.options.length === 1) {
+                sel.innerHTML = '<option value="">No hay horarios disponibles</option>';
             }
+        } catch (e) {
+            console.error(e);
+            sel.innerHTML = '<option value="">Error al cargar horarios</option>';
+        }
+    }
+
+    function generarSlots(inicio, fin, intervalo, duracionServicio) {
+        const slots = [];
+        let [h, m] = inicio.split(':').map(Number);
+        const [fh, fm] = fin.split(':').map(Number);
+        const finMin = fh * 60 + fm;
+
+        while (h * 60 + m + duracionServicio <= finMin) {
+            const hh = String(h).padStart(2, '0');
+            const mm = String(m).padStart(2, '0');
+            slots.push(hh + ':' + mm);
+            m += intervalo;
+            while (m >= 60) { h++; m -= 60; }
+        }
+        return slots;
+    }
+
+    function conflictoHorario(fechaHoraReserva, slotInicio, duracionMin) {
+        const r = new Date(fechaHoraReserva);
+        const s = new Date(slotInicio);
+        const rFin = new Date(r.getTime() + duracionMin * 60000);
+        const sFin = new Date(s.getTime() + duracionMin * 60000);
+        return s >= rFin || r >= sFin;
+    }
+
+    async function confirmarReserva() {
+        const servicio_id = document.getElementById('res-servicio').value;
+        const mesa_id = document.getElementById('res-mesa').value;
+        const fecha = document.getElementById('res-fecha').value;
+        const horario = document.getElementById('res-horario').value;
+        hide('reservar-error'); hide('reservar-success');
+
+        if (!servicio_id || !mesa_id || !fecha || !horario) {
+            show('reservar-error');
+            document.getElementById('reservar-error').textContent = 'Completa todos los campos';
+            return;
         }
 
-        cargarServicios();
-    </script>
+        try {
+            const data = await apiFetch('/reservas', {
+                method: 'POST',
+                body: JSON.stringify({ mesa_id: parseInt(mesa_id), servicio_id: parseInt(servicio_id), fecha_hora: fecha + 'T' + horario })
+            });
+
+            document.getElementById('modal-servicio').textContent = 'Servicio: ' + data.Servicio.nombre;
+            document.getElementById('modal-mesa').textContent = 'Mesa: #' + data.Mesa.numero + ' (Cap. ' + data.Mesa.capacidad + ')';
+            const d = new Date(data.fecha_hora);
+            document.getElementById('modal-fecha').textContent = 'Fecha: ' + d.toLocaleDateString('es-CL');
+            document.getElementById('modal-hora').textContent = 'Hora: ' + d.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('modal-precio').textContent = '$' + parseFloat(data.Servicio.precio).toFixed(2);
+            document.getElementById('modal-confirmacion').classList.add('active');
+
+            cargarSlots();
+        } catch (err) {
+            show('reservar-error');
+            document.getElementById('reservar-error').textContent = getError(err);
+        }
+    }
+
+    async function cargarMisReservas() {
+        try {
+            const data = await apiFetch('/reservas/mis-reservas');
+            const tbody = document.getElementById('tabla-mis-reservas');
+            tbody.innerHTML = '';
+            if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="color:var(--muted);padding:24px">No tienes reservas</td></tr>'; return; }
+
+            data.forEach(r => {
+                const d = new Date(r.fecha_hora);
+                const estadoClass = r.estado === 'cancelada' ? 'badge-danger' : r.estado === 'confirmada' ? 'badge-success' : 'badge-warning';
+                tbody.innerHTML += '<tr><td>#' + r.id + '</td><td>' + (r.Servicio ? r.Servicio.nombre : '-') + '</td><td>Mesa #' + (r.Mesa ? r.Mesa.numero : '-') + '</td><td>' + d.toLocaleDateString('es-CL') + ' ' + d.toLocaleTimeString('es-CL', {hour:'2-digit',minute:'2-digit'}) + '</td><td><span class="badge ' + estadoClass + '">' + r.estado + '</span></td><td>' + (r.estado !== 'cancelada' ? '<button class="btn btn-danger" onclick="cancelarReserva(' + r.id + ')">Cancelar</button>' : '-') + '</td></tr>';
+            });
+        } catch (e) { console.error(e); }
+    }
+
+    async function cancelarReserva(id) {
+        if (!confirm('¿Cancelar esta reserva?')) return;
+        try {
+            await apiFetch('/reservas/' + id + '/cancelar', { method: 'PATCH' });
+            cargarMisReservas();
+        } catch (err) { alert(getError(err)); }
+    }
+
+    async function cargarAgenda() {
+        const fecha = document.getElementById('agenda-fecha').value;
+        if (!fecha) return;
+        try {
+            const data = await apiFetch('/reservas/agenda?fecha=' + fecha);
+            const container = document.getElementById('agenda-container');
+            container.innerHTML = '';
+
+            if (data.length === 0) {
+                container.innerHTML = '<div class="card text-center" style="color:var(--muted)">No hay reservas para esta fecha</div>';
+                return;
+            }
+
+            data.forEach(r => {
+                const d = new Date(r.fecha_hora);
+                const hora = d.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+                container.innerHTML += '<div class="agenda-card"><div class="agenda-time">' + hora + '</div><div class="agenda-info"><span class="agenda-cliente">' + (r.Usuario ? r.Usuario.nombre : 'Cliente') + '</span><span class="agenda-detalle">' + (r.Servicio ? r.Servicio.nombre : '') + ' - Mesa #' + (r.Mesa ? r.Mesa.numero : '') + '</span></div><span class="badge ' + (r.estado === 'cancelada' ? 'badge-danger' : 'badge-success') + '">' + r.estado + '</span></div>';
+            });
+        } catch (e) { console.error(e); }
+    }
+
+    async function cargarReservasPorFecha() {
+        const fecha = document.getElementById('rf-fecha').value;
+        if (!fecha) return;
+        try {
+            const data = await apiFetch('/reservas/por-fecha?fecha=' + fecha);
+            const tbody = document.getElementById('tabla-reservas-fecha');
+            tbody.innerHTML = '';
+            if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="color:var(--muted);padding:24px">Sin reservas en esta fecha</td></tr>'; return; }
+
+            data.forEach(r => {
+                const d = new Date(r.fecha_hora);
+                const hora = d.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+                const estClass = r.estado === 'cancelada' ? 'badge-danger' : r.estado === 'confirmada' ? 'badge-success' : 'badge-warning';
+                tbody.innerHTML += '<tr><td>#' + r.id + '</td><td>' + (r.Usuario ? r.Usuario.nombre : '-') + '</td><td>' + (r.Servicio ? r.Servicio.nombre : '-') + '</td><td>Mesa #' + (r.Mesa ? r.Mesa.numero : '-') + '</td><td>' + hora + '</td><td><span class="badge ' + estClass + '">' + r.estado + '</span></td></tr>';
+            });
+        } catch (e) { console.error(e); }
+    }
+
+    async function cargarServiciosTabla() {
+        try {
+            const data = await apiFetch('/servicios');
+            const tbody = document.getElementById('tabla-servicios');
+            tbody.innerHTML = '';
+            data.forEach(s => {
+                tbody.innerHTML += '<tr><td style="color:var(--muted)">#' + s.id + '</td><td style="font-weight:500">' + s.nombre + '</td><td><span class="badge badge-primary">' + s.duracion + ' min</span></td><td class="price">$' + s.precio + '</td><td class="actions-cell"><button class="btn btn-warning" onclick="editarServicio(' + s.id + ',\'' + s.nombre + '\',' + s.duracion + ',' + s.precio + ')">Editar</button><button class="btn btn-danger" onclick="eliminarServicio(' + s.id + ')">Borrar</button></td></tr>';
+            });
+        } catch (e) { console.error(e); }
+    }
+
+    async function guardarServicio() {
+        const id = document.getElementById('svc-id').value;
+        const nombre = document.getElementById('svc-nombre').value.trim();
+        const duracion = document.getElementById('svc-duracion').value;
+        const precio = document.getElementById('svc-precio').value;
+        if (!nombre || !duracion || !precio) return alert('Llena todos los campos');
+
+        try {
+            if (id) {
+                await apiFetch('/servicios/' + id, { method: 'PUT', body: JSON.stringify({ nombre, duracion: parseInt(duracion), precio: parseFloat(precio) }) });
+            } else {
+                await apiFetch('/servicios', { method: 'POST', body: JSON.stringify({ nombre, duracion: parseInt(duracion), precio: parseFloat(precio) }) });
+            }
+            cancelarEdicionServicio();
+            cargarServiciosTabla();
+            cargarServiciosSelect();
+        } catch (err) { alert(getError(err)); }
+    }
+
+    function editarServicio(id, nombre, duracion, precio) {
+        document.getElementById('svc-id').value = id;
+        document.getElementById('svc-nombre').value = nombre;
+        document.getElementById('svc-duracion').value = duracion;
+        document.getElementById('svc-precio').value = precio;
+        document.getElementById('svc-form-title').textContent = 'Editar Servicio #' + id;
+        document.getElementById('svc-cancelar').classList.remove('hidden');
+    }
+
+    function cancelarEdicionServicio() {
+        document.getElementById('svc-id').value = '';
+        document.getElementById('svc-nombre').value = '';
+        document.getElementById('svc-duracion').value = '';
+        document.getElementById('svc-precio').value = '';
+        document.getElementById('svc-form-title').textContent = 'Crear Servicio';
+        document.getElementById('svc-cancelar').classList.add('hidden');
+    }
+
+    async function eliminarServicio(id) {
+        if (!confirm('¿Eliminar este servicio?')) return;
+        try {
+            await apiFetch('/servicios/' + id, { method: 'DELETE' });
+            cargarServiciosTabla();
+            cargarServiciosSelect();
+        } catch (err) { alert(getError(err)); }
+    }
+
+    async function cargarMesasTabla() {
+        try {
+            const data = await apiFetch('/mesas');
+            const tbody = document.getElementById('tabla-mesas');
+            tbody.innerHTML = '';
+            data.forEach(m => {
+                tbody.innerHTML += '<tr><td style="color:var(--muted)">#' + m.id + '</td><td style="font-weight:500">Mesa ' + m.numero + '</td><td>' + m.capacidad + ' personas</td><td class="actions-cell"><button class="btn btn-warning" onclick="editarMesa(' + m.id + ',' + m.numero + ',' + m.capacidad + ')">Editar</button><button class="btn btn-danger" onclick="eliminarMesa(' + m.id + ')">Borrar</button></td></tr>';
+            });
+        } catch (e) { console.error(e); }
+    }
+
+    async function guardarMesa() {
+        const id = document.getElementById('mesa-id').value;
+        const numero = parseInt(document.getElementById('mesa-numero').value);
+        const capacidad = parseInt(document.getElementById('mesa-capacidad').value);
+        if (!numero || !capacidad) return alert('Numero y capacidad obligatorios');
+
+        try {
+            if (id) {
+                await apiFetch('/mesas/' + id, { method: 'PUT', body: JSON.stringify({ numero, capacidad }) });
+            } else {
+                await apiFetch('/mesas', { method: 'POST', body: JSON.stringify({ numero, capacidad }) });
+            }
+            cancelarEdicionMesa();
+            cargarMesasTabla();
+            cargarMesasSelect();
+        } catch (err) { alert(getError(err)); }
+    }
+
+    function editarMesa(id, numero, capacidad) {
+        document.getElementById('mesa-id').value = id;
+        document.getElementById('mesa-numero').value = numero;
+        document.getElementById('mesa-capacidad').value = capacidad;
+        document.getElementById('mesa-form-title').textContent = 'Editar Mesa #' + id;
+        document.getElementById('mesa-cancelar').classList.remove('hidden');
+    }
+
+    function cancelarEdicionMesa() {
+        document.getElementById('mesa-id').value = '';
+        document.getElementById('mesa-numero').value = '';
+        document.getElementById('mesa-capacidad').value = '';
+        document.getElementById('mesa-form-title').textContent = 'Agregar Mesa';
+        document.getElementById('mesa-cancelar').classList.add('hidden');
+    }
+
+    async function eliminarMesa(id) {
+        if (!confirm('¿Eliminar esta mesa?')) return;
+        try {
+            await apiFetch('/mesas/' + id, { method: 'DELETE' });
+            cargarMesasTabla();
+            cargarMesasSelect();
+        } catch (err) { alert(getError(err)); }
+    }
+
+    async function cargarDisponibilidad() {
+        try {
+            const data = await apiFetch('/disponibilidades');
+            const tbody = document.getElementById('tabla-disponibilidad');
+            tbody.innerHTML = '';
+            data.forEach(d => {
+                tbody.innerHTML += '<tr><td>' + DIAS[d.dia_semana] + '</td><td>' + d.hora_inicio.slice(0,5) + '</td><td>' + d.hora_fin.slice(0,5) + '</td><td>' + d.intervalo_min + ' min</td><td class="actions-cell"><button class="btn btn-warning" onclick="editarDisp(' + d.id + ',' + d.dia_semana + ',\'' + d.hora_inicio.slice(0,5) + '\',\'' + d.hora_fin.slice(0,5) + '\',' + d.intervalo_min + ')">Editar</button><button class="btn btn-danger" onclick="eliminarDisp(' + d.id + ')">Borrar</button></td></tr>';
+            });
+        } catch (e) { console.error(e); }
+    }
+
+    async function guardarDisponibilidad() {
+        const id = document.getElementById('disp-id').value;
+        const dia_semana = parseInt(document.getElementById('disp-dia').value);
+        const hora_inicio = document.getElementById('disp-inicio').value;
+        const hora_fin = document.getElementById('disp-fin').value;
+        const intervalo_min = parseInt(document.getElementById('disp-intervalo').value);
+        if (!hora_inicio || !hora_fin) return alert('Completa los campos');
+
+        try {
+            if (id) {
+                await apiFetch('/disponibilidades/' + id, { method: 'PUT', body: JSON.stringify({ dia_semana, hora_inicio, hora_fin, intervalo_min }) });
+            } else {
+                await apiFetch('/disponibilidades', { method: 'POST', body: JSON.stringify({ dia_semana, hora_inicio, hora_fin, intervalo_min }) });
+            }
+            cancelarEdicionDisp();
+            cargarDisponibilidad();
+        } catch (err) { alert(getError(err)); }
+    }
+
+    function editarDisp(id, dia, inicio, fin, intervalo) {
+        document.getElementById('disp-id').value = id;
+        document.getElementById('disp-dia').value = dia;
+        document.getElementById('disp-inicio').value = inicio;
+        document.getElementById('disp-fin').value = fin;
+        document.getElementById('disp-intervalo').value = intervalo;
+        document.getElementById('disp-form-title').textContent = 'Editar Horario';
+        document.getElementById('disp-cancelar').classList.remove('hidden');
+    }
+
+    function cancelarEdicionDisp() {
+        document.getElementById('disp-id').value = '';
+        document.getElementById('disp-dia').value = '1';
+        document.getElementById('disp-inicio').value = '';
+        document.getElementById('disp-fin').value = '';
+        document.getElementById('disp-intervalo').value = '60';
+        document.getElementById('disp-form-title').textContent = 'Agregar Horario';
+        document.getElementById('disp-cancelar').classList.add('hidden');
+    }
+
+    async function eliminarDisp(id) {
+        if (!confirm('¿Eliminar este horario?')) return;
+        try {
+            await apiFetch('/disponibilidades/' + id, { method: 'DELETE' });
+            cargarDisponibilidad();
+        } catch (err) { alert(getError(err)); }
+    }
+
+    window.addEventListener('hashchange', () => {
+        if (usuario && token) {
+            const hash = location.hash.slice(1) || 'reservar';
+            navigate(hash);
+        } else {
+            const hash = location.hash.slice(1);
+            if (hash === 'register') showAuth('register');
+            else showAuth('login');
+        }
+    });
+
+    init();
+</script>
 </body>
 </html>

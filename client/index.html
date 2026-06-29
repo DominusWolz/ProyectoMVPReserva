@@ -6,22 +6,27 @@
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
         .form-group { background: #f4f4f4; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
-        input { padding: 8px; margin-right: 10px; }
-        button { padding: 8px 15px; background: #007bff; color: white; border: none; cursor: pointer; }
+        input { padding: 8px; margin-right: 10px; width: 180px; }
+        button { padding: 8px 15px; background: #007bff; color: white; border: none; cursor: pointer; border-radius: 3px; }
         button.danger { background: #dc3545; }
-        table { width: 100%; border-collapse: collapse; }
+        button.warning { background: #ffc107; color: black; margin-right: 5px; }
+        button.secondary { background: #6c757d; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        th { background-color: #e9ecef; }
     </style>
 </head>
 <body>
     <h1>Gestión de Servicios (Panel Admin)</h1>
     
     <div class="form-group">
-        <h3>Crear Nuevo Servicio</h3>
+        <h3 id="form-title">Crear Nuevo Servicio</h3>
+        <input type="hidden" id="servicio-id">
         <input type="text" id="nombre" placeholder="Nombre (ej. Cena VIP)">
         <input type="number" id="duracion" placeholder="Duración (min)">
         <input type="number" id="precio" placeholder="Precio ($)">
-        <button onclick="crearServicio()">Guardar Servicio</button>
+        <button id="btn-guardar" onclick="guardarServicio()">Guardar Servicio</button>
+        <button id="btn-cancelar" class="secondary" style="display:none;" onclick="cancelarEdicion()">Cancelar</button>
     </div>
 
     <table>
@@ -43,50 +48,89 @@
 
         // 1. Leer Servicios (Read)
         async function cargarServicios() {
-            const res = await fetch(API_URL);
-            const servicios = await res.json();
-            const tbody = document.getElementById('tabla-servicios');
-            tbody.innerHTML = '';
-            
-            servicios.forEach(s => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${s.id}</td>
-                        <td>${s.nombre}</td>
-                        <td>${s.duracion} min</td>
-                        <td>$${s.precio}</td>
-                        <td>
-                            <button class="danger" onclick="eliminarServicio(${s.id})">Eliminar</button>
-                        </td>
-                    </tr>
-                `;
-            });
+            try {
+                const res = await fetch(API_URL);
+                const servicios = await res.json();
+                const tbody = document.getElementById('tabla-servicios');
+                tbody.innerHTML = '';
+                
+                servicios.forEach(s => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${s.id}</td>
+                            <td>${s.nombre}</td>
+                            <td>${s.duracion} min</td>
+                            <td>$${s.precio}</td>
+                            <td>
+                                <button class="warning" onclick="prepararEdicion(${s.id}, '${s.nombre}', ${s.duracion}, ${s.precio})">Editar</button>
+                                <button class="danger" onclick="eliminarServicio(${s.id})">Eliminar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error al conectar con el backend:", error);
+            }
         }
 
-        // 2. Crear Servicio (Create)
-        async function crearServicio() {
+        // 2. Crear o Editar Servicio (Create / Update)
+        async function guardarServicio() {
+            const id = document.getElementById('servicio-id').value;
             const nombre = document.getElementById('nombre').value;
             const duracion = document.getElementById('duracion').value;
             const precio = document.getElementById('precio').value;
 
-            if(!nombre || !duracion || !precio) return alert("Llena todos los campos");
+            if(!nombre || !duracion || !precio) return alert("Por favor, llena todos los campos");
 
-            await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nombre, duracion, precio })
-            });
+            const datos = { nombre, duracion: parseInt(duracion), precio: parseFloat(precio) };
+
+            if (id) {
+                // Si hay ID, estamos EDITANDO (PUT)
+                await fetch(`${API_URL}/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+            } else {
+                // Si no hay ID, estamos CREANDO (POST)
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+            }
             
-            // Limpiar inputs y recargar tabla
+            cancelarEdicion();
+            cargarServicios(); 
+        }
+
+        // Función para cargar los datos del servicio en el formulario
+        function prepararEdicion(id, nombre, duracion, precio) {
+            document.getElementById('servicio-id').value = id;
+            document.getElementById('nombre').value = nombre;
+            document.getElementById('duracion').value = duracion;
+            document.getElementById('precio').value = precio;
+            
+            document.getElementById('form-title').innerText = "Editar Servicio ID: " + id;
+            document.getElementById('btn-guardar').innerText = "Actualizar Servicio";
+            document.getElementById('btn-cancelar').style.display = "inline-block";
+        }
+
+        // Cancelar el estado de edición y limpiar el formulario
+        function cancelarEdicion() {
+            document.getElementById('servicio-id').value = '';
             document.getElementById('nombre').value = '';
             document.getElementById('duracion').value = '';
             document.getElementById('precio').value = '';
-            cargarServicios(); 
+            
+            document.getElementById('form-title').innerText = "Crear Nuevo Servicio";
+            document.getElementById('btn-guardar').innerText = "Guardar Servicio";
+            document.getElementById('btn-cancelar').style.display = "none";
         }
 
         // 3. Eliminar Servicio (Delete)
         async function eliminarServicio(id) {
-            if(confirm('¿Estás seguro de eliminar este servicio?')) {
+            if(confirm('¿Estás seguro de que deseas eliminar este servicio?')) {
                 const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
                 if(!res.ok) {
                     const error = await res.json();
@@ -96,7 +140,7 @@
             }
         }
 
-        // Cargar los datos al abrir la página
+        // Carga inicial al abrir la página
         cargarServicios();
     </script>
 </body>

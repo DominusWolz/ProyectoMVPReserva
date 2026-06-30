@@ -1,9 +1,0 @@
-{
-  "development": {
-    "username": "root",
-    "password": "Catdog10",
-    "database": "reservas_db",
-    "host": "localhost",
-    "dialect": "mysql"
-  }
-}

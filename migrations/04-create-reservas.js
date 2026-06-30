@@ -55,6 +55,14 @@ module.exports = {
         allowNull: false
       }
     });
+
+    await queryInterface.addIndex('reservas', ['mesa_id', 'fecha_hora', 'estado'], {
+      name: 'idx_reservas_mesa_fecha_estado'
+    });
+
+    await queryInterface.addIndex('reservas', ['usuario_id'], {
+      name: 'idx_reservas_usuario'
+    });
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('reservas');

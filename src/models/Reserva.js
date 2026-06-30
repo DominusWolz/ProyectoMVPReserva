@@ -30,7 +30,11 @@ const Reserva = (sequelize) => {
     }
   }, {
     tableName: 'reservas',
-    timestamps: true
+    timestamps: true,
+    indexes: [
+      { fields: ['mesa_id', 'fecha_hora', 'estado'] },
+      { fields: ['usuario_id'] }
+    ]
   });
 };
 

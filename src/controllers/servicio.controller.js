@@ -1,9 +1,23 @@
+const { Op } = require('sequelize');
 const { Servicio } = require('../database');
+
+const normalizarServicio = (body) => ({
+  nombre: String(body.nombre || '').trim(),
+  duracion: Number(body.duracion),
+  precio: Number(body.precio)
+});
+
+const validarServicio = ({ nombre, duracion, precio }) => {
+  if (!nombre) return 'El nombre del servicio es obligatorio';
+  if (!Number.isInteger(duracion) || duracion <= 0) return 'La duracion debe ser un numero entero mayor a 0';
+  if (!Number.isFinite(precio) || precio < 0) return 'El precio debe ser un numero mayor o igual a 0';
+  return null;
+};
 
 // Obtener todos los servicios (Read)
 const obtenerServicios = async (req, res) => {
   try {
-    const servicios = await Servicio.findAll();
+    const servicios = await Servicio.findAll({ order: [['nombre', 'ASC']] });
     res.json(servicios);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener los servicios' });
@@ -13,7 +27,13 @@ const obtenerServicios = async (req, res) => {
 // Crear un nuevo servicio (Create)
 const crearServicio = async (req, res) => {
   try {
-    const { nombre, duracion, precio } = req.body;
+    const { nombre, duracion, precio } = normalizarServicio(req.body);
+    const errorValidacion = validarServicio({ nombre, duracion, precio });
+    if (errorValidacion) return res.status(400).json({ error: errorValidacion });
+
+    const existe = await Servicio.findOne({ where: { nombre } });
+    if (existe) return res.status(409).json({ error: 'Ya existe un servicio con ese nombre' });
+
     const nuevoServicio = await Servicio.create({ nombre, duracion, precio });
     res.status(201).json(nuevoServicio);
   } catch (error) {
@@ -25,10 +45,20 @@ const crearServicio = async (req, res) => {
 const actualizarServicio = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, duracion, precio } = req.body;
+    const { nombre, duracion, precio } = normalizarServicio(req.body);
+    const errorValidacion = validarServicio({ nombre, duracion, precio });
+    if (errorValidacion) return res.status(400).json({ error: errorValidacion });
     
     const servicio = await Servicio.findByPk(id);
     if (!servicio) return res.status(404).json({ error: 'Servicio no encontrado' });
+
+    const existe = await Servicio.findOne({
+      where: {
+        nombre,
+        id: { [Op.ne]: id }
+      }
+    });
+    if (existe) return res.status(409).json({ error: 'Ya existe un servicio con ese nombre' });
     
     await servicio.update({ nombre, duracion, precio });
     res.json(servicio);

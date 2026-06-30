@@ -2,12 +2,20 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Usuario } = require('../database');
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const register = async (req, res) => {
   try {
-    const { nombre, email, password, rol } = req.body;
+    const nombre = String(req.body.nombre || '').trim();
+    const email = String(req.body.email || '').trim().toLowerCase();
+    const password = String(req.body.password || '');
 
     if (!nombre || !email || !password) {
       return res.status(400).json({ error: 'Nombre, email y password son obligatorios' });
+    }
+
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'El email no tiene un formato valido' });
     }
 
     if (password.length < 6) {
@@ -26,12 +34,12 @@ const register = async (req, res) => {
       nombre,
       email,
       password: passwordHash,
-      rol: rol || 'cliente'
+      rol: 'cliente'
     });
 
     const token = jwt.sign(
       { id: usuario.id, email: usuario.email, rol: usuario.rol },
-      process.env.JWT_SECRET || 'secreto_dev',
+      process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
@@ -48,7 +56,8 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const email = String(req.body.email || '').trim().toLowerCase();
+    const password = String(req.body.password || '');
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email y password son obligatorios' });
@@ -66,7 +75,7 @@ const login = async (req, res) => {
 
     const token = jwt.sign(
       { id: usuario.id, email: usuario.email, rol: usuario.rol },
-      process.env.JWT_SECRET || 'secreto_dev',
+      process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 

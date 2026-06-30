@@ -1,4 +1,16 @@
+const { Op } = require('sequelize');
 const { Mesa } = require('../database');
+
+const normalizarMesa = (body) => ({
+  numero: Number(body.numero),
+  capacidad: Number(body.capacidad)
+});
+
+const validarMesa = ({ numero, capacidad }) => {
+  if (!Number.isInteger(numero) || numero <= 0) return 'El numero de mesa debe ser un entero mayor a 0';
+  if (!Number.isInteger(capacidad) || capacidad <= 0) return 'La capacidad debe ser un entero mayor a 0';
+  return null;
+};
 
 const obtenerMesas = async (req, res) => {
   try {
@@ -11,10 +23,10 @@ const obtenerMesas = async (req, res) => {
 
 const crearMesa = async (req, res) => {
   try {
-    const { numero, capacidad } = req.body;
-    if (!numero || !capacidad) {
-      return res.status(400).json({ error: 'Numero y capacidad son obligatorios' });
-    }
+    const { numero, capacidad } = normalizarMesa(req.body);
+    const errorValidacion = validarMesa({ numero, capacidad });
+    if (errorValidacion) return res.status(400).json({ error: errorValidacion });
+
     const existe = await Mesa.findOne({ where: { numero } });
     if (existe) {
       return res.status(409).json({ error: 'Ya existe una mesa con ese numero' });
@@ -29,9 +41,21 @@ const crearMesa = async (req, res) => {
 const actualizarMesa = async (req, res) => {
   try {
     const { id } = req.params;
-    const { numero, capacidad } = req.body;
+    const { numero, capacidad } = normalizarMesa(req.body);
+    const errorValidacion = validarMesa({ numero, capacidad });
+    if (errorValidacion) return res.status(400).json({ error: errorValidacion });
+
     const mesa = await Mesa.findByPk(id);
     if (!mesa) return res.status(404).json({ error: 'Mesa no encontrada' });
+
+    const existe = await Mesa.findOne({
+      where: {
+        numero,
+        id: { [Op.ne]: id }
+      }
+    });
+    if (existe) return res.status(409).json({ error: 'Ya existe una mesa con ese numero' });
+
     await mesa.update({ numero, capacidad });
     res.json(mesa);
   } catch (error) {

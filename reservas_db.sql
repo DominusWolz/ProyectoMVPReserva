@@ -51,13 +51,16 @@ CREATE TABLE reservas (
   estado ENUM('pendiente', 'confirmada', 'cancelada') NOT NULL DEFAULT 'confirmada',
   createdAt DATETIME NOT NULL,
   updatedAt DATETIME NOT NULL,
+  INDEX idx_reservas_mesa_fecha_estado (mesa_id, fecha_hora, estado),
+  INDEX idx_reservas_usuario (usuario_id),
   CONSTRAINT fk_reserva_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON UPDATE CASCADE ON DELETE RESTRICT,
   CONSTRAINT fk_reserva_mesa FOREIGN KEY (mesa_id) REFERENCES mesas(id) ON UPDATE CASCADE ON DELETE RESTRICT,
   CONSTRAINT fk_reserva_servicio FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 INSERT INTO usuarios (nombre, email, password, rol, createdAt, updatedAt) VALUES
-('Admin', 'admin@restaurant.com', '$2a$10$placeholder', 'admin', NOW(), NOW());
+('Admin', 'admin@restaurant.com', '$2b$10$QWjP8rRkPj/SE9s7SkEbyuYfirPhkLXIifNBfQ4PyxMo45lWf33EO', 'admin', NOW(), NOW()),
+('Cliente Demo', 'cliente@demo.com', '$2b$10$QWjP8rRkPj/SE9s7SkEbyuYfirPhkLXIifNBfQ4PyxMo45lWf33EO', 'cliente', NOW(), NOW());
 
 INSERT INTO mesas (numero, capacidad) VALUES
 (1, 2), (2, 4), (3, 4), (4, 6), (5, 8);
@@ -66,3 +69,11 @@ INSERT INTO servicios (nombre, duracion, precio, createdAt, updatedAt) VALUES
 ('Mesa Estandar', 120, 0.00, NOW(), NOW()),
 ('Cena de Aniversario', 180, 15000.00, NOW(), NOW()),
 ('Salon Privado VIP', 240, 50000.00, NOW(), NOW());
+
+INSERT INTO disponibilidades (dia_semana, hora_inicio, hora_fin, intervalo_min, createdAt, updatedAt) VALUES
+(2, '09:00:00', '18:00:00', 60, NOW(), NOW()),
+(3, '09:00:00', '18:00:00', 60, NOW(), NOW()),
+(4, '09:00:00', '18:00:00', 60, NOW(), NOW()),
+(5, '09:00:00', '18:00:00', 60, NOW(), NOW()),
+(6, '09:00:00', '18:00:00', 60, NOW(), NOW()),
+(7, '09:00:00', '18:00:00', 60, NOW(), NOW());

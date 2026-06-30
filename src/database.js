@@ -1,12 +1,19 @@
 const { Sequelize } = require('sequelize');
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
+
+const requiredEnv = ['DB_HOST', 'DB_USER', 'DB_NAME', 'JWT_SECRET'];
+const missingEnv = requiredEnv.filter((key) => !process.env[key] || process.env[key].trim() === '');
+
+if (missingEnv.length > 0) {
+  throw new Error('Faltan variables de entorno requeridas: ' + missingEnv.join(', '));
+}
 
 const sequelize = new Sequelize(
-  process.env.DB_NAME || 'reservas_db',
-  process.env.DB_USER || 'root',
-  process.env.DB_PASSWORD || 'Catdog10',
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD || '',
   {
-    host: process.env.DB_HOST || 'localhost',
+    host: process.env.DB_HOST,
     dialect: 'mysql',
     logging: false
   }
